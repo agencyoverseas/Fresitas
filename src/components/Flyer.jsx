@@ -17,30 +17,53 @@ const FlyerCanvas=React.forwardRef(({fl,onSlot},ref)=>{
   const Circle=({on,onClick})=>(<div onClick={onClick} style={{width:20,height:20,borderRadius:"50%",margin:"0 auto",border:on?"none":`1.6px solid ${MUT}`,background:on?BROWN:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:onClick?"pointer":"default"}}>{on&&<svg viewBox="0 0 24 24" width="12" height="12"><path d="M5 13l4 4L19 7" fill="none" stroke="#fff" strokeWidth="3"/></svg>}</div>);
   const cols=`92px repeat(${fl.slots.length},1fr)`;
   if(fl.template==="pricelist"){
-    const TH=fl.plTheme||"#5A2070";
-    return(<div ref={ref} style={{width:350,background:"#FBF7F2",color:"#2A2A2A",fontFamily:"'Outfit',sans-serif",padding:"18px 16px",boxSizing:"border-box",position:"relative"}}>
+    const TH=fl.plTheme||"#5A2070"; const st=(fl.plStyle||"bars"); const mini=st==="minimal", aurea=st==="aurea", bsp=st==="beautyspot", princess=st==="princess", two=aurea||bsp||princess;
+    return(<div ref={ref} style={{width:350,background:princess?"#FBEEF0":bsp?"#FBF6EE":aurea?"#F3EBE0":mini?"#F5F5F5":"#FBF7F2",color:"#2A2A2A",fontFamily:"'Outfit',sans-serif",padding:"18px 16px",boxSizing:"border-box",position:"relative"}}>
       <div style={{textAlign:"center",marginBottom:14}}>
-        <div style={{fontFamily:"'Anton',sans-serif",fontSize:34,letterSpacing:1,color:"#171717",lineHeight:1}}>{fl.plTitle}</div>
-        <div style={{fontFamily:"'Dancing Script',cursive",fontSize:23,color:TH,fontWeight:700,marginTop:-2}}>{fl.plSubtitle}</div>
-        <div style={{height:2,width:90,background:TH,margin:"6px auto 0",borderRadius:2}}/>
+        <div style={{fontFamily:two?"'Fraunces',serif":"'Anton',sans-serif",fontSize:two?30:34,letterSpacing:1,color:bsp?TH:"#171717",lineHeight:1,fontStyle:aurea?"italic":"normal",...(bsp||princess?{color:TH}:{})}}>{fl.plTitle}</div>
+        <div style={{fontFamily:"'Dancing Script',cursive",fontSize:23,color:mini?"#171717":TH,fontWeight:700,marginTop:-2}}>{fl.plSubtitle}</div>
+        <div style={{height:mini?1:2,width:mini?"100%":90,background:mini?"#1A1A1A":TH,margin:"6px auto 0",borderRadius:2}}/>
       </div>
-      {fl.plCategories.map((cat)=>(
-        <div key={cat.id} style={{marginBottom:13}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5}}>
-            {cat.photo&&<img src={cat.photo} style={{width:36,height:36,borderRadius:"50%",objectFit:"cover",flex:"0 0 auto"}}/>}
-            <div style={{flex:1,background:TH,color:"#fff",fontFamily:"'Anton',sans-serif",fontSize:13,letterSpacing:.5,padding:"6px 12px",borderRadius:20}}>{cat.name}</div>
-          </div>
-          {cat.items.map((it,ii)=>(
-            <div key={ii} style={{display:"flex",alignItems:"baseline",gap:4,padding:"2px 4px"}}>
-              <span style={{fontSize:12,color:"#2A2A2A"}}>{it.label}</span>
-              <span style={{flex:1,borderBottom:"1px dotted #C9BCA8",margin:"0 2px",position:"relative",top:-3}}/>
-              <span style={{fontSize:13,fontWeight:700,color:TH}}>{it.prix} EUR</span>
+      {two?(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>{fl.plCategories.map((cat)=> aurea?(
+        <div key={cat.id} style={{background:"#EADFCF",borderRadius:14,padding:"9px 9px 7px"}}>
+          <div style={{border:`1px solid ${TH}`,background:"#fff",borderRadius:16,padding:"4px 6px",textAlign:"center",fontSize:9.5,letterSpacing:.3,color:TH,fontWeight:700,marginBottom:6}}>{cat.name}</div>
+          {cat.items.map((it,ii)=>(<div key={ii} style={{display:"flex",alignItems:"baseline",gap:3,padding:"2px 0",borderBottom:ii<cat.items.length-1?"1px dotted #D3C3B0":"none"}}><span style={{color:TH,fontSize:8}}>{"\u2726"}</span><span style={{fontSize:9.5,color:"#4A3A32",flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{it.label}</span><span style={{fontSize:10.5,fontWeight:700,color:TH}}>{it.prix}&#8364;</span></div>))}
+        </div>):bsp?(
+        <div key={cat.id} style={{background:"#fff",borderRadius:12,overflow:"hidden",border:"1px solid #E8D9B8"}}>
+          <div style={{background:`linear-gradient(90deg, ${TH}, #C9A24B)`,color:"#fff",fontFamily:"'Anton',sans-serif",fontSize:11,letterSpacing:.5,padding:"6px 10px",marginBottom:5}}>{cat.name}</div>
+          <div style={{padding:"0 10px 4px"}}>{cat.items.map((it,ii)=>(<div key={ii} style={{display:"flex",alignItems:"baseline",gap:3,padding:"2px 0"}}><span style={{fontSize:9.5,color:"#5A4A3A",flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{it.label}</span><span style={{fontSize:11,fontWeight:700,color:TH}}>{it.prix}&#8364;</span></div>))}</div>
+        </div>):(
+        <div key={cat.id} style={{marginBottom:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3}}>{cat.photo&&<img src={cat.photo} style={{width:44,height:44,borderRadius:"50%",objectFit:"cover",flex:"0 0 auto"}}/>}<div style={{background:"#F3D9DE",borderRadius:"12px 12px 12px 3px",padding:"2px 10px"}}><span style={{fontFamily:"'Dancing Script',cursive",fontSize:15,fontWeight:700,color:TH}}>{cat.name}</span></div></div>
+          {cat.items.map((it,ii)=>(<div key={ii} style={{display:"flex",alignItems:"baseline",gap:3,padding:"1px 0"}}><span style={{fontSize:9.5,color:"#5A4A4A",flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{it.label}</span><span style={{fontSize:10.5,fontWeight:700,color:TH}}>{it.prix}&#8364;</span></div>))}
+        </div>))}</div>):fl.plCategories.map((cat)=> mini
+        ?(<div key={cat.id} style={{display:"flex",gap:12,marginBottom:14,alignItems:"flex-start"}}>
+            {cat.photo&&<img src={cat.photo} style={{width:54,height:54,borderRadius:"50%",objectFit:"cover",flex:"0 0 auto",marginTop:2}}/>}
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontFamily:"'Anton',sans-serif",fontSize:15,letterSpacing:.5,color:"#1A1A1A",borderBottom:"1.5px solid #1A1A1A",paddingBottom:3,marginBottom:5}}>{cat.name}</div>
+              {cat.items.map((it,ii)=>(
+                <div key={ii} style={{display:"flex",alignItems:"baseline",gap:4,padding:"2px 0"}}>
+                  <span style={{fontSize:11.5,color:"#4A4A4A"}}>{it.label}</span>
+                  <span style={{flex:1,borderBottom:"1px dotted #BBB",margin:"0 3px",position:"relative",top:-3}}/>
+                  <span style={{fontSize:12.5,fontWeight:700,color:TH}}>{it.prix} EUR</span>
+                </div>))}
             </div>
-          ))}
-        </div>
-      ))}
+          </div>)
+        :(<div key={cat.id} style={{marginBottom:13}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5}}>
+              {cat.photo&&<img src={cat.photo} style={{width:36,height:36,borderRadius:"50%",objectFit:"cover",flex:"0 0 auto"}}/>}
+              <div style={{flex:1,background:TH,color:"#fff",fontFamily:"'Anton',sans-serif",fontSize:13,letterSpacing:.5,padding:"6px 12px",borderRadius:20}}>{cat.name}</div>
+            </div>
+            {cat.items.map((it,ii)=>(
+              <div key={ii} style={{display:"flex",alignItems:"baseline",gap:4,padding:"2px 4px"}}>
+                <span style={{fontSize:12,color:"#2A2A2A"}}>{it.label}</span>
+                <span style={{flex:1,borderBottom:"1px dotted #C9BCA8",margin:"0 2px",position:"relative",top:-3}}/>
+                <span style={{fontSize:13,fontWeight:700,color:TH}}>{it.prix} EUR</span>
+              </div>))}
+          </div>)
+      )}
       <div style={{textAlign:"center",marginTop:8,paddingTop:10,borderTop:"1px solid #E4D9C8"}}>
-        <div style={{fontSize:12,color:TH,fontWeight:700}}>{fl.plContact}</div>
+        <div style={{fontSize:12,color:mini?"#1A1A1A":TH,fontWeight:700}}>{fl.plContact}</div>
         <div style={{fontSize:10,color:"#9A8A78",marginTop:2}}>{fl.plFooter}</div>
       </div>
     </div>);
@@ -74,6 +97,26 @@ const FlyerCanvas=React.forwardRef(({fl,onSlot},ref)=>{
         <div style={{flex:1,textAlign:"center",fontStyle:"italic",fontSize:11,color:PU}}>{fl.listFooter}</div>
       </div>
       <div style={{textAlign:"center",fontFamily:"'Dancing Script',cursive",fontSize:17,color:PU,marginTop:2}}>{fl.cta}</div>
+    </div>);
+  }
+  if(fl.template==="promo"){
+    const BG=fl.promoTheme||"#1A1A1A", AC="#F4B8C4";
+    const dot=(g)=>(<span style={{width:20,height:20,borderRadius:"50%",background:AC,color:BG,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flex:"0 0 auto"}}>{g}</span>);
+    return(<div ref={ref} style={{width:350,background:BG,color:"#fff",fontFamily:"'Outfit',sans-serif",boxSizing:"border-box",position:"relative",overflow:"hidden"}}>
+      {fl.promoPhoto&&<img src={fl.promoPhoto} style={{width:"100%",height:160,objectFit:"cover",display:"block"}}/>}
+      <div style={{padding:"16px 18px 20px"}}>
+        <div style={{fontFamily:"'Dancing Script',cursive",fontSize:24,color:AC,lineHeight:1}}>{fl.promoName}</div>
+        <div style={{fontFamily:"'Fraunces',serif",fontSize:27,fontWeight:700,lineHeight:1.05,marginTop:2}}>{fl.promoTagline}</div>
+        <div style={{background:AC,color:BG,fontFamily:"'Anton',sans-serif",fontSize:13,letterSpacing:1,padding:"5px 14px",borderRadius:20,display:"inline-block",margin:"14px 0 10px"}}>NOS SERVICES :</div>
+        {fl.promoServices.map((s,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:7}}>{dot("\u2713")}<span style={{fontSize:14,fontWeight:600}}>{s}</span></div>)}
+        <div style={{background:AC,color:BG,fontFamily:"'Anton',sans-serif",fontSize:13,letterSpacing:1,padding:"5px 14px",borderRadius:20,display:"inline-block",margin:"14px 0 10px"}}>{fl.promoCTA}</div>
+        <div style={{display:"flex",flexDirection:"column",gap:7}}>
+          {fl.promoFB&&<div style={{display:"flex",alignItems:"center",gap:8,fontSize:13}}>{dot("f")}{fl.promoFB}</div>}
+          {fl.promoPhone&&<div style={{display:"flex",alignItems:"center",gap:8,fontSize:13}}>{dot("\u260E")}{fl.promoPhone}</div>}
+          {fl.promoIG&&<div style={{display:"flex",alignItems:"center",gap:8,fontSize:13}}>{dot("\u25C9")}{fl.promoIG}</div>}
+          {fl.promoAddress&&<div style={{display:"flex",alignItems:"center",gap:8,fontSize:13}}>{dot("\u25CF")}{fl.promoAddress}</div>}
+        </div>
+      </div>
     </div>);
   }
   return(
@@ -193,6 +236,7 @@ export default function FlyerP({d,upd,go}){
         <option value="grille" style={{color:"#000"}}>Grille dispos</option>
         <option value="liste" style={{color:"#000"}}>Liste dispos</option>
         <option value="pricelist" style={{color:"#000"}}>Price list</option>
+        <option value="promo" style={{color:"#000"}}>Promo vitrine</option>
       </select>
     </div>
     <div style={{padding:16}}>
@@ -209,9 +253,10 @@ export default function FlyerP({d,upd,go}){
       </div>
 
       <div className="card" style={{margin:"0 0 12px"}}><b>Modele du flyer</b>
-        <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:8}}>
-          {[["grille","Grille dispos"],["liste","Liste dispos"],["pricelist","Price list"]].map(([v,l])=>
-            <button key={v} onClick={()=>set("template",v)} className="btn sm" style={{background:fl.template===v?"linear-gradient(135deg,#5A2070,#9B60C0)":"#F0E4FA",color:fl.template===v?"#fff":"#5A2070",padding:"8px 12px"}}>{l}</button>)}
+        <p style={{fontSize:11,color:"#A09080",margin:"2px 0 6px"}}>Glisse pour choisir &rarr;</p>
+        <div style={{display:"flex",gap:10,marginTop:2,overflowX:"auto",paddingBottom:8,scrollSnapType:"x mandatory",WebkitOverflowScrolling:"touch"}}>
+          {[["grille","Grille dispos"],["liste","Liste dispos"],["pricelist","Price list"],["promo","Promo vitrine"]].map(([v,l])=>
+            <button key={v} onClick={()=>set("template",v)} style={{scrollSnapAlign:"start",flex:"0 0 auto",minWidth:120,padding:"14px 16px",borderRadius:14,border:fl.template===v?"none":"1px solid #E4D4F0",background:fl.template===v?"linear-gradient(135deg,#5A2070,#9B60C0)":"#fff",color:fl.template===v?"#fff":"#5A2070",fontWeight:700,fontSize:13,cursor:"pointer"}}>{l}</button>)}
         </div>
       </div>
       {/* Selecteur de flyer */}
@@ -300,6 +345,7 @@ export default function FlyerP({d,upd,go}){
       {fl.template==="pricelist"&&(<>
       <div className="card" style={{margin:"0 0 12px"}}><b>Price list — en-tete</b>
         <div style={{marginTop:8}}>
+          <div style={{marginBottom:10}}><span className="fl">Style</span><div style={{display:"flex",gap:8,marginTop:4}}>{[["bars","Barres couleur"],["minimal","Minimal (photos)"],["aurea","Aurea 2 col"],["beautyspot","Beauty Spot"],["princess","Nails Princess"]].map(([v,l])=><button key={v} onClick={()=>set("plStyle",v)} className="btn sm" style={{background:(fl.plStyle||"bars")===v?"linear-gradient(135deg,#5A2070,#9B60C0)":"#F0E4FA",color:(fl.plStyle||"bars")===v?"#fff":"#5A2070",padding:"6px 12px"}}>{l}</button>)}</div></div>
           <div className="fg" style={{marginBottom:8}}><span className="fl">Titre</span><input className="fi" value={fl.plTitle} onChange={e=>set("plTitle",e.target.value)}/></div>
           <div className="fg" style={{marginBottom:8}}><span className="fl">Sous-titre</span><input className="fi" value={fl.plSubtitle} onChange={e=>set("plSubtitle",e.target.value)}/></div>
           <div className="fg"><span className="fl">Couleur (theme)</span><input className="fi" type="color" style={{height:40,padding:3}} value={fl.plTheme} onChange={e=>set("plTheme",e.target.value)}/></div>
@@ -361,6 +407,28 @@ export default function FlyerP({d,upd,go}){
             </div>
           </div>))}
         <button className="btn btn-s sm" onClick={()=>upd(x=>{const ff=x.cfg.flyers[idx];ff.days.push({date:"",label:"NOUVEAU JOUR",avail:ff.slots.map(()=>false)});})}>+ Ajouter un jour</button>
+      </div>
+      </>)}
+
+      {fl.template==="promo"&&(<>
+      <div className="card" style={{margin:"0 0 12px"}}><b>Promo — visuel & textes</b>
+        <div style={{margin:"8px 0"}}><span className="fl">Photo principale</span>{fl.promoPhoto&&<img src={fl.promoPhoto} style={{width:"100%",maxHeight:120,objectFit:"cover",borderRadius:8,display:"block",margin:"4px 0"}}/>}<input type="file" accept="image/*" style={{fontSize:11}} onChange={e=>{const fi=e.target.files[0];if(fi){const r=new FileReader();r.onload=()=>upd(x=>{x.cfg.flyers[idx].promoPhoto=r.result;});r.readAsDataURL(fi);}}}/>{fl.promoPhoto&&<button className="btn btn-d sm" style={{marginLeft:6,fontSize:9}} onClick={()=>set("promoPhoto","")}>Retirer</button>}</div>
+        <div className="fg" style={{marginBottom:8}}><span className="fl">Couleur de fond</span><input className="fi" type="color" style={{height:40,padding:3}} value={fl.promoTheme} onChange={e=>set("promoTheme",e.target.value)}/></div>
+        <Field lbl="Nom (script)" k="promoName"/>
+        <Field lbl="Sous-titre" k="promoTagline"/>
+        <Field lbl="Bouton (call to action)" k="promoCTA"/>
+      </div>
+      <div className="card" style={{margin:"0 0 12px"}}><b>Services</b>
+        {fl.promoServices.map((s,i)=><div key={i} style={{display:"flex",gap:6,marginBottom:6}}><input className="fi" style={{flex:1}} value={s} onChange={e=>upd(x=>{x.cfg.flyers[idx].promoServices[i]=e.target.value;})}/><button className="btn btn-d sm" style={{padding:"4px 7px",fontSize:9}} onClick={()=>upd(x=>{x.cfg.flyers[idx].promoServices.splice(i,1);})}>x</button></div>)}
+        <button className="btn btn-s sm" onClick={()=>upd(x=>{x.cfg.flyers[idx].promoServices.push("Nouveau service");})}>+ Ajouter</button>
+      </div>
+      <div className="card" style={{margin:"0 0 12px"}}><b>Contact</b>
+        <div style={{marginTop:8}}>
+          <Field lbl="Facebook" k="promoFB"/>
+          <Field lbl="Telephone" k="promoPhone"/>
+          <Field lbl="Instagram" k="promoIG"/>
+          <Field lbl="Adresse" k="promoAddress"/>
+        </div>
       </div>
       </>)}
 

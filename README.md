@@ -245,3 +245,43 @@ Ajout du **3e modèle de flyer** et du **sélecteur en rangée** (le bouton dema
 **État des modèles** : Grille dispos ✓, Liste dispos ✓, Price list ✓ (couvre images 1/3/5/6/8 + tes tarifs).
 **Restant** : **Promo vitrine** (images 2 et 7 : photo + services + contact). On continue un par un.
 
+## 16. Modèle "Promo vitrine" + slider de modèles
+
+- **Slider horizontal** (glisse gauche-droite) pour choisir le modèle, dans la carte « Modèle du flyer » : **Grille dispos · Liste dispos · Price list · Promo vitrine**.
+- **Promo vitrine** (style images Thando's / Amina) : **photo** uploadable, **couleur de fond** réglable, nom (script) + sous-titre, bloc **NOS SERVICES** (liste en ajout/suppression), bouton CTA, bloc **contact** (Facebook, téléphone, Instagram, adresse).
+- Preview live + export PNG/PDF.
+
+**4 modèles disponibles** : Grille ✓, Liste ✓, Price list ✓, Promo ✓. Les autres price lists (Beauty Salon, Auréa, Beauty Spot, Nails by Princess) = **styles du modèle Price list**, ajoutés un par un.
+
+**Important** : pense à **repousser sur GitHub** (le script Termux) pour que Vercel mette à jour ton site en ligne avec ces modèles.
+
+## 17. Styles du Price list (un par un)
+
+Le modèle **Price list** a maintenant un **sélecteur de Style** (dans « Price list — en-tete ») pour matcher tes différentes maquettes sans casser le contenu :
+- **Barres couleur** — le style d'origine (en-têtes de catégorie colorés).
+- **Minimal (photos)** — style Beauty Salon : **photo ronde à gauche** de chaque catégorie, titre noir souligné, lignes à pointillés, fond gris clair, monochrome.
+
+Le contenu (catégories/prix) est partagé entre les styles — tu changes juste l'apparence. « Reprendre mes formules » pré-remplit depuis tes Formules.
+
+- **Aurea 2 col** — style Auréa : beige, titre serif italique, **2 colonnes** de cartes arrondies, en-tête de catégorie en pilule, sans photo.
+
+- **Beauty Spot** — doré chic : ivoire, titre bordeaux serif, **2 colonnes**, en-têtes de catégorie en **dégradé bordeaux→or**, sans photo.
+
+- **Nails Princess** — rose : en-têtes de catégorie en **script sur pastille rose**, **photo ronde** par catégorie, 2 colonnes.
+
+**Les 5 designs sont faits.** Chaque flyer garde sa mise en page ; tu changes **textes, prix, photos** (via l'éditeur) et la **couleur** (sélecteur « Couleur (theme) »).
+
+## 18. Devis branché sur les vrais prix (phase 3b)
+
+L'étape **Devis** du flux de réservation (bouton +) utilise maintenant tes vrais systèmes de prix, au lieu de l'ancien courts/moyens/longs :
+
+- **Base du prix, au choix** :
+  - **Reprise** → nb de locks + zone (longueur) + grosseur → prix calculé par le moteur (tranche × coef zone × coef grosseur)
+  - **Formule** → choix d'une formule + longueur → prix de la formule
+- **Prestations en plus** : cases à cocher (depuis ton catalogue Prestations), chacune ajoute son prix fixe
+- **Total** = base + prestations − fidélité ; **acompte** = total × %acompte
+- Le **message WhatsApp/devis** liste la base + chaque prestation + la réduction, et la **création du RDV** enregistre le bon libellé et le bon prix
+
+Testé : Reprise 30 locks/Épaules/Fines = 120€, + prestation = 140€, Formule RETWIST courtes = 80€, RDV créé au bon prix.
+
+**Note** : la page **Devis** autonome (menu Plus) utilise encore l'ancien calcul simple — je peux l'aligner sur ce système au besoin (c'est le flux + qui est le chemin principal).

@@ -51,7 +51,7 @@ const DEFAULT_FLYER={
   contactText:"RENDEZ-VOUS EN DM INSTAGRAM OU WHATSAPP",
   footer:["1 SEMAINE SEULEMENT","PLACES LIMITEES","EXPERTISE LOCKS","PASSION & SAVOIR-FAIRE"],
   template:"grille",
-  plTitle:"TARIFS",plSubtitle:"Fresita Locks",plTheme:"#5A2070",plContact:"@fresitalocks_",plFooter:"Reserve ton creneau en DM",
+  plTitle:"TARIFS",plSubtitle:"Fresita Locks",plStyle:"bars",plTheme:"#5A2070",plContact:"@fresitalocks_",plFooter:"Reserve ton creneau en DM",
   plCategories:[
     {id:"pc1",name:"RETWIST SEUL",photo:"",items:[{label:"Locks courtes",prix:80},{label:"Locks mi-longues",prix:90},{label:"Locks longues",prix:100},{label:"Locks tres longues",prix:110}]},
     {id:"pc2",name:"FORMULE SIMPLE",photo:"",items:[{label:"Locks courtes",prix:125},{label:"Locks mi-longues",prix:145},{label:"Locks longues",prix:165},{label:"Locks tres longues",prix:185}]},
@@ -59,7 +59,10 @@ const DEFAULT_FLYER={
   ],
   attn:"Ce sont mes derniers creneaux en Guadeloupe pour l'ete ! Apres, je serai en France",
   listBadge:"DERNIERES DISPONIBILITES DU MOIS !",
-  listFooter:"Reserve vite ton creneau avant qu'il ne soit pris !"
+  listFooter:"Reserve vite ton creneau avant qu'il ne soit pris !",
+  promoTheme:"#1A1A1A",promoName:"Fresita Locks",promoTagline:"Salon & Spa",promoPhoto:"",
+  promoServices:["Retwist / Entretien","Soins profonds","Coiffure sur locks","Shampoing"],
+  promoCTA:"RESERVE MAINTENANT",promoPhone:"",promoIG:"@fresitalocks_",promoFB:"Fresita Locks",promoAddress:""
 };
 const DEFAULT_PRESTATIONS=[
   {id:"coiffure",nom:"Coiffure",prix:20,duree:45,desc:"Mise en forme apres reprise",cat:"Ajouts"},
@@ -81,7 +84,7 @@ const calcPrix=(pricing,nbLocks,zoneId,grosseurId)=>{
 
 const sv=d=>{try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){}};
 const ld=()=>{try{const r=localStorage.getItem(SK);if(!r)return null;const d=JSON.parse(r);if(d&&d.cfg&&!d.cfg.pricing)d.cfg.pricing=JSON.parse(JSON.stringify(DEFAULT_PRICING));if(d&&d.cfg&&!d.cfg.prestations)d.cfg.prestations=JSON.parse(JSON.stringify(DEFAULT_PRESTATIONS));if(d&&d.cfg&&!d.cfg.flyers)d.cfg.flyers=[JSON.parse(JSON.stringify(DEFAULT_FLYER))];
-    if(d&&d.cfg&&d.cfg.flyers)d.cfg.flyers.forEach(fl=>{if(!fl.template)fl.template="grille";if(!fl.plCategories){fl.plTitle="TARIFS";fl.plSubtitle="Fresita Locks";fl.plTheme="#5A2070";fl.plContact="@fresitalocks_";fl.plFooter="Reserve ton creneau en DM";fl.plCategories=JSON.parse(JSON.stringify(DEFAULT_FLYER.plCategories));}if(!fl.attn){fl.attn=DEFAULT_FLYER.attn;fl.listBadge=DEFAULT_FLYER.listBadge;fl.listFooter=DEFAULT_FLYER.listFooter;}});if(d&&!d.reservations)d.reservations=[];if(d&&d.cfg&&!d.cfg.formules)d.cfg.formules=JSON.parse(JSON.stringify(DEFAULT_FORMULES));return d}catch(e){return null}};
+    if(d&&d.cfg&&d.cfg.flyers)d.cfg.flyers.forEach(fl=>{if(!fl.template)fl.template="grille";if(!fl.plStyle)fl.plStyle="bars";if(!fl.plCategories){fl.plTitle="TARIFS";fl.plSubtitle="Fresita Locks";fl.plTheme="#5A2070";fl.plContact="@fresitalocks_";fl.plFooter="Reserve ton creneau en DM";fl.plCategories=JSON.parse(JSON.stringify(DEFAULT_FLYER.plCategories));}if(!fl.attn){fl.attn=DEFAULT_FLYER.attn;fl.listBadge=DEFAULT_FLYER.listBadge;fl.listFooter=DEFAULT_FLYER.listFooter;}if(!fl.promoName){fl.promoTheme=DEFAULT_FLYER.promoTheme;fl.promoName=DEFAULT_FLYER.promoName;fl.promoTagline=DEFAULT_FLYER.promoTagline;fl.promoPhoto="";fl.promoServices=JSON.parse(JSON.stringify(DEFAULT_FLYER.promoServices));fl.promoCTA=DEFAULT_FLYER.promoCTA;fl.promoPhone="";fl.promoIG=DEFAULT_FLYER.promoIG;fl.promoFB=DEFAULT_FLYER.promoFB;fl.promoAddress="";}});if(d&&!d.reservations)d.reservations=[];if(d&&d.cfg&&!d.cfg.formules)d.cfg.formules=JSON.parse(JSON.stringify(DEFAULT_FORMULES));return d}catch(e){return null}};
 
 /* ═══ LOCATION ═══ */
 const LOC={commune:"Les Abymes",map:"https://maps.google.com/?q=Les+Abymes,+Guadeloupe"};
@@ -132,6 +135,7 @@ const dlICS=(title,date,time)=>{const dt=date.replace(/-/g,"");const h=(time.spl
 const MSG={
   photo:n=>(n?"Coucou "+n+" !":"Bonjour !")+"\n\nPour te faire un devis personnalise, j'aurais besoin de :\n\n- Une photo ou video de tes locks de DOS\n- Une photo ou video de COTE\n- Si tu as des locks a reparer, montre-les moi et dis-moi combien il y en a\n\nJe te reponds rapidement !\n\n-- Fresita",
   devis:(n,base,ll,sty,styP,rep,repP,tot,dep,loyD)=>(n?"Coucou "+n+" !":"Bonjour !")+"\n\nTon devis Fresitalocks :\n\nRetwist (locks "+ll+") -- "+base+"EUR"+(sty?"\nCoiffure -- "+styP+"EUR":"")+(rep>0?"\nReparations ("+rep+" lock"+(rep>1?"s":"")+") -- "+repP+"EUR":"")+(loyD>0?"\nReduction fidelite -- -"+loyD+"EUR":"")+"\n\nTotal : "+tot+"EUR"+(dep>0?"\n\nAcompte "+dep+"EUR (50%) pour confirmer.\nNon remboursable (conserve prochain RDV).\nPaiement : PayPal, Sumeria, Wero ou especes.\n\nPour reserver :\n- Nom prenom\n- Telephone\n- Email\n- Acompte "+dep+"EUR\n\nDes reception = creneau reserve !":"\nOn se dit quand ?")+"\n\n-- Fresita",
+  devis2:(n,lines,tot,dep,depPct)=>(n?"Coucou "+n+" !":"Bonjour !")+"\n\nTon devis Fresitalocks :\n\n"+lines.join("\n")+"\n\nTotal : "+tot+"EUR"+(dep>0?"\n\nAcompte "+dep+"EUR ("+depPct+"%) pour confirmer.\nNon remboursable (conserve prochain RDV).\nPaiement : PayPal, Sumeria, Wero ou especes.\n\nPour reserver :\n- Nom prenom\n- Telephone\n- Email\n- Acompte "+dep+"EUR\n\nDes reception = creneau reserve !":"\nOn se dit quand ?")+"\n\n-- Fresita",
   confirm:(n,date,time,price,dep,svc)=>(n?"Coucou "+n+" !":"Bonjour !")+"\n\nTon RDV Fresitalocks est confirme !\n\nDate : "+date+" a "+time+"\nPrestation : "+(svc||"Retwist")+"\nTotal : "+price+"EUR\nAcompte recu : "+dep+"EUR\nSolde jour J : "+(price-dep)+"EUR\n\nAdresse : Les Abymes, Guadeloupe\n"+LOC.map+"\n\nPrepare-toi :\n- Fais ton shampooing la veille ou le jour meme\n- Prevois 2h a 2h30\n- Diagnostic capillaire complet inclus\n- Photos avant/apres incluses\n- Routine perso + produits recommandes\n\nPas d'accompagnateurs ni d'enfants non prevus.\n+15 min retard = annulation (+20EUR maintien).\nJoignable par message/WhatsApp uniquement.\n\nA tres vite !\nFresita",
   j1:(n,t)=>(n?"Coucou "+n+" !":"Bonjour !")+"\n\nRappel : on se voit demain a "+t+" !\n\nShampooing ce soir ou demain matin.\n+15 min = annulation.\nPas d'accompagnateurs non prevus.\n\nAdresse : Les Abymes\n"+LOC.map+"\n\nA demain !\n-- Fresita",
   retwist:(n,f,s)=>(n?"Hey "+n+" !":"Bonjour !")+"\n\nCa fait "+f+" semaines, c'est le moment !\n\nMes dispos :\n"+s+"\n\nTu veux quel creneau ?\n-- Fresita",
@@ -167,7 +171,7 @@ const DEF={
   ],
   slots:[{day:6,lb:"Sam",ts:["9h-11h30","13h-15h30"]},{day:3,lb:"Mer",ts:["14h-16h30"]}],
   cfg:{short:70,med:80,lng:90,sty:20,rpl:6,rpd:5,rpc:100,depPct:50,loyTh:5,loyDis:15,refDis:10,pricing:DEFAULT_PRICING,prestations:DEFAULT_PRESTATIONS,flyers:[DEFAULT_FLYER],formules:DEFAULT_FORMULES},
-  flow:{step:1,fn:"",len:"med",sty:false,rep:0,cName:"",cPhone:"",cMail:"",date:"",time:"09:00",exId:null,svc:"",tot:0,dep:0},
+  flow:{step:1,fn:"",len:"med",sty:false,rep:0,mode:"reprise",nbLocks:30,zoneId:"",grosseurId:"",formuleId:"",formuleLi:0,prestSel:[],cName:"",cPhone:"",cMail:"",date:"",time:"09:00",exId:null,svc:"",tot:0,dep:0},
   reservations:[],
 };
 

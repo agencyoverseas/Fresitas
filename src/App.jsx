@@ -154,13 +154,21 @@ function App(){
   const FlowP=({d,setD,pg,setPg,sel,setSel,ct,setCt,more,setMore,toast,setToast,go,wa,cp,upd,setFlow,f,rtAlerts,bdAlerts,exportData})=>{
     const ec=f.exId?d.clients.find(c=>c.id===f.exId):null;
     const loyE=ec&&ec.loy>=d.cfg.loyTh&&ec.loy%d.cfg.loyTh===0;const loyD=loyE?d.cfg.loyDis:0;
-    const pr=d.cfg;const base=f.len==="short"?pr.short:f.len==="lng"?pr.lng:pr.med;const styP=f.sty?pr.sty:0;
-    const repP=f.rep>20?pr.rpc:f.rep>10?10*pr.rpl+(f.rep-10)*pr.rpd:f.rep*pr.rpl;
-    const tot=base+styP+repP-loyD;const dep=ec?.tr?0:Math.round(tot*pr.depPct/100);
-    const ll=f.len==="short"?"courts":f.len==="lng"?"longs":"moyens";
+    const pr=d.cfg; const P=pr.pricing; const FORMS=pr.formules||[]; const PREST=pr.prestations||[]; const mode=f.mode||"reprise";
+    const nb=(f.nbLocks===""||f.nbLocks==null)?"":f.nbLocks;
+    const zid=f.zoneId||(P&&P.zones[0]?P.zones[0].id:""); const gid=f.grosseurId||(P&&P.grosseurs[0]?P.grosseurs[0].id:"");
+    const fo=FORMS.find(x=>x.id===f.formuleId)||FORMS[0]; const li=fo?Math.min(f.formuleLi||0,fo.lengths.length-1):0;
+    let base=0, baseLabel="";
+    if(mode==="formule"){const ln=fo&&fo.lengths[li];base=ln?ln.prix:0;baseLabel=fo?(fo.title+(ln?" ("+ln.label+")":"")):"Formule";}
+    else{base=calcPrix(P,(parseInt(nb)||0),zid,gid);const z=P&&P.zones.find(x=>x.id===zid);const g=P&&P.grosseurs.find(x=>x.id===gid);baseLabel="Reprise "+(parseInt(nb)||0)+" locks"+(z?" "+z.label:"")+(g?" "+g.label:"");}
+    const prestSel=f.prestSel||[]; const presList=PREST.filter(p=>prestSel.includes(p.id)); const presTot=presList.reduce((s,p)=>s+(p.prix||0),0);
+    const tot=Math.max(0,base+presTot-loyD);const dep=ec?.tr?0:Math.round(tot*pr.depPct/100);
     const dn=ec?ec.n.split(" ")[0]:"";
     const matches=f.fn.length>=2?d.clients.filter(c=>c.n.toLowerCase().includes(f.fn.toLowerCase())):[];
     const titles=["Demande photo","Devis","Infos + Acompte","Confirmation"];
+    const dmLines=[baseLabel+" -- "+base+"EUR",...presList.map(p=>p.nom+" -- "+p.prix+"EUR"),...(loyD>0?["Reduction fidelite -- -"+loyD+"EUR"]:[])];
+    const dmsg=MSG.devis2(dn,dmLines,tot,dep,pr.depPct);
+    const svc=baseLabel+(presList.length?" + "+presList.map(p=>p.nom).join(", "):"");
 
     return(<div className="pg fade">
       <div className="hdr hdr-sm" style={{textAlign:"center"}}>
@@ -184,13 +192,20 @@ function App(){
         </div>}
 
         {f.step===2&&<div className="card" style={{margin:0}}>
-          <div className="fr"><div className="fg"><span className="fl">Longueur</span><select className="fi" value={f.len} onChange={e=>setFlow({len:e.target.value})}><option value="short">Courts {pr.short}EUR</option><option value="med">Moyens {pr.med}EUR</option><option value="lng">Longs {pr.lng}EUR</option></select></div>
-            <div className="fg"><span className="fl">Coiffure</span><div style={{display:"flex",gap:6,marginTop:4}}><button className={`btn sm ${!f.sty?"btn-p":"btn-s"}`} onClick={()=>setFlow({sty:false})}>Non</button><button className={`btn sm ${f.sty?"btn-p":"btn-s"}`} onClick={()=>setFlow({sty:true})}>+{pr.sty}EUR</button></div></div></div>
-          <div className="fg"><span className="fl">Reparations</span><input className="fi" type="number" min="0" value={f.rep} onChange={e=>setFlow({rep:e.target.value===""?"":parseInt(e.target.value)||0})}/></div>
-          {loyD>0&&<div style={{padding:10,background:"#F0E4FA",borderRadius:12,marginBottom:12,fontSize:12}}>Fidelite : -{loyD}EUR</div>}
-          <div style={{background:"linear-gradient(135deg,#5A2070,#9B60C0)",borderRadius:18,padding:18,color:"#fff",textAlign:"center",marginBottom:12}}><div style={{fontSize:10,opacity:.7,letterSpacing:1,textTransform:"uppercase"}}>Total</div><div style={{fontFamily:"'Fraunces',serif",fontSize:36,fontWeight:700}}>{tot}EUR</div>{dep>0&&<div style={{fontSize:11,opacity:.8,marginTop:4}}>Acompte {dep}EUR</div>}</div>
-          <div className="wa-box"><div className="wa-msg">{MSG.devis(dn,base,ll,f.sty,styP,f.rep,repP,tot,dep,loyD)}</div></div>
-          <div style={{display:"flex",gap:8,marginTop:14}}><button className="btn btn-w sm" style={{flex:1}} onClick={()=>wa(MSG.devis(dn,base,ll,f.sty,styP,f.rep,repP,tot,dep,loyD),ec?.ph)}>WhatsApp</button><button className="btn btn-s sm" style={{flex:1}} onClick={()=>cp(MSG.devis(dn,base,ll,f.sty,styP,f.rep,repP,tot,dep,loyD))}>Copier</button></div>
+          <div className="fg"><span className="fl">Base du prix</span><div style={{display:"flex",gap:6,marginTop:4}}><button className={`btn sm ${mode==="reprise"?"btn-p":"btn-s"}`} onClick={()=>setFlow({mode:"reprise"})}>Reprise (locks)</button><button className={`btn sm ${mode==="formule"?"btn-p":"btn-s"}`} onClick={()=>setFlow({mode:"formule"})}>Formule</button></div></div>
+          {mode==="reprise"?<>
+            <div className="fg"><span className="fl">Nb de locks</span><input className="fi" type="number" value={nb} onChange={e=>setFlow({nbLocks:e.target.value===""?"":parseInt(e.target.value)||0})}/></div>
+            <div className="fr"><div className="fg"><span className="fl">Longueur (zone)</span><select className="fi" value={zid} onChange={e=>setFlow({zoneId:e.target.value})}>{(P?P.zones:[]).map(z=><option key={z.id} value={z.id}>{z.label}</option>)}</select></div>
+            <div className="fg"><span className="fl">Grosseur</span><select className="fi" value={gid} onChange={e=>setFlow({grosseurId:e.target.value})}>{(P?P.grosseurs:[]).map(g=><option key={g.id} value={g.id}>{g.label}</option>)}</select></div></div>
+          </>:<>
+            <div className="fg"><span className="fl">Formule</span><select className="fi" value={fo?fo.id:""} onChange={e=>setFlow({formuleId:e.target.value,formuleLi:0})}>{FORMS.map(x=><option key={x.id} value={x.id}>{x.title}</option>)}</select></div>
+            <div className="fg"><span className="fl">Longueur</span><select className="fi" value={li} onChange={e=>setFlow({formuleLi:parseInt(e.target.value)})}>{(fo?fo.lengths:[]).map((l,i)=><option key={i} value={i}>{l.label} - {l.prix}EUR</option>)}</select></div>
+          </>}
+          <div className="fg"><span className="fl">Prestations en plus</span><div style={{marginTop:4}}>{PREST.map(p=><label key={p.id} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 0",fontSize:13}}><input type="checkbox" checked={prestSel.includes(p.id)} onChange={e=>setFlow({prestSel:e.target.checked?[...prestSel,p.id]:prestSel.filter(x=>x!==p.id)})}/>{p.nom}<span style={{color:"#7A6488",marginLeft:"auto"}}>+{p.prix}EUR</span></label>)}{PREST.length===0&&<div style={{fontSize:11,color:"#A09080"}}>Aucune (ajoute-les dans Reglages)</div>}</div></div>
+          {loyD>0&&<div style={{padding:10,background:"#F0E4FA",borderRadius:12,margin:"8px 0",fontSize:12}}>Fidelite : -{loyD}EUR</div>}
+          <div style={{background:"linear-gradient(135deg,#5A2070,#9B60C0)",borderRadius:18,padding:18,color:"#fff",textAlign:"center",margin:"12px 0"}}><div style={{fontSize:10,opacity:.7,letterSpacing:1,textTransform:"uppercase"}}>Total</div><div style={{fontFamily:"'Fraunces',serif",fontSize:36,fontWeight:700}}>{tot}EUR</div>{dep>0&&<div style={{fontSize:11,opacity:.8,marginTop:4}}>Acompte {dep}EUR</div>}</div>
+          <div className="wa-box"><div className="wa-msg">{dmsg}</div></div>
+          <div style={{display:"flex",gap:8,marginTop:14}}><button className="btn btn-w sm" style={{flex:1}} onClick={()=>wa(dmsg,ec?.ph)}>WhatsApp</button><button className="btn btn-s sm" style={{flex:1}} onClick={()=>cp(dmsg)}>Copier</button></div>
           <button className="btn btn-p full" style={{marginTop:12}} onClick={()=>setFlow({step:3})}>Accepte &rarr;</button>
         </div>}
 
@@ -199,7 +214,7 @@ function App(){
           <div className="fg"><span className="fl">Email</span><input className="fi" value={f.cMail} onChange={e=>setFlow({cMail:e.target.value})}/></div></>}
           {ec&&<div style={{padding:10,background:"#F0E4FA",borderRadius:12,marginBottom:12,fontSize:12}}>{ec.n} - {ec.ph}</div>}
           <div className="fr"><div className="fg"><span className="fl">Date RDV</span><input className="fi" type="date" value={f.date} onChange={e=>setFlow({date:e.target.value})}/></div><div className="fg"><span className="fl">Heure</span><input className="fi" type="time" value={f.time} onChange={e=>setFlow({time:e.target.value})}/></div></div>
-          <button className="btn btn-p full" onClick={()=>{const svc=`Retwist ${ll}${f.sty?" +coiffure":""}${f.rep>0?` +${f.rep}repa`:""}`;setFlow({step:4,svc,tot,dep});upd(x=>{let cid=f.exId;if(!cid){cid="c"+Date.now();x.clients.push({id:cid,n:f.cName||f.fn,ph:f.cPhone,em:f.cMail,cr:new Date().toISOString().slice(0,10),bday:"",vis:0,vip:false,tr:false,rf:4,ref:null,photos:[],diag:[],loy:0,rev:[]});}x.apts.push({id:"a"+Date.now(),cid,date:f.date,time:f.time,svc,pr:tot,dep,dpd:true,dm:"",pd:false});x.flow.step=4;x.flow.svc=svc;x.flow.tot=tot;x.flow.dep=dep})}}>Creer RDV &rarr;</button>
+          <button className="btn btn-p full" onClick={()=>{setFlow({step:4,svc,tot,dep});upd(x=>{let cid=f.exId;if(!cid){cid="c"+Date.now();x.clients.push({id:cid,n:f.cName||f.fn,ph:f.cPhone,em:f.cMail,cr:new Date().toISOString().slice(0,10),bday:"",vis:0,vip:false,tr:false,rf:4,ref:null,photos:[],diag:[],loy:0,rev:[]});}x.apts.push({id:"a"+Date.now(),cid,date:f.date,time:f.time,svc,pr:tot,dep,dpd:true,dm:"",pd:false});x.flow.step=4;x.flow.svc=svc;x.flow.tot=tot;x.flow.dep=dep})}}>Creer RDV &rarr;</button>
         </div>}
 
         {f.step===4&&<div className="card" style={{margin:0}}>
