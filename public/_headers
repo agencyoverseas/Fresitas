@@ -1,0 +1,7 @@
+# Netlify — empeche la mise en cache du service worker et du manifest.
+# Sans ca, un ancien SW peut rester actif jusqu'a 24h apres un deploiement.
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/manifest.webmanifest
+  Cache-Control: public, max-age=0, must-revalidate
