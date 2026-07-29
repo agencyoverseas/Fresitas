@@ -29,7 +29,7 @@ function App(){
   /* ═══ SPLASH ═══ */
   if(pg==="splash")return(<div className="app" style={{alignItems:"center",justifyContent:"center",background:"linear-gradient(160deg,#FBF7F2,#F0E8F8)"}}>
     <div style={{textAlign:"center",animation:"fadeIn 1s ease"}}>
-      <div style={{fontFamily:"'Fraunces',serif",fontSize:32,fontWeight:700,color:"#5A2070",marginBottom:8}}>Fresitalocks</div>
+      <img src="logo.png" alt="Fresita Locks" style={{width:240,maxWidth:"72vw",marginBottom:6}}/>
       <div style={{fontSize:11,letterSpacing:4,textTransform:"uppercase",color:"#7B3FA0",opacity:.5}}>Locktician</div>
     </div>
   </div>);

@@ -285,3 +285,13 @@ L'étape **Devis** du flux de réservation (bouton +) utilise maintenant tes vra
 Testé : Reprise 30 locks/Épaules/Fines = 120€, + prestation = 140€, Formule RETWIST courtes = 80€, RDV créé au bon prix.
 
 **Note** : la page **Devis** autonome (menu Plus) utilise encore l'ancien calcul simple — je peux l'aligner sur ce système au besoin (c'est le flux + qui est le chemin principal).
+
+## 19. Logo Fresita Locks (icônes + démarrage)
+
+- **icon-192.png** et **icon-512.png** régénérées depuis ton logo (carré, logo centré sur fond blanc) → icône sur l'écran d'accueil + splash Android.
+- **logo.png** (transparent) ajouté et affiché sur l'**écran de démarrage** de l'app (à la place du texte "Fresitalocks"), sous-titre "Locktician" conservé.
+- `logo.png` mis en cache (offline) via la config PWA.
+
+**Résolution** : ton logo source fait 249×107 px une fois rogné — l'icône 512 est donc un peu douce en agrandissant. Pour des icônes bien nettes, fournis un logo plus grand (idéalement carré ~1024×1024) et je régénère.
+
+**Important après déploiement** : si tu avais déjà "installé" l'app sur ton écran d'accueil, l'ancienne icône peut rester en cache. **Retire l'app de l'écran d'accueil et rajoute-la** pour voir la nouvelle icône.

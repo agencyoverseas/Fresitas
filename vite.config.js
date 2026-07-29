@@ -10,7 +10,7 @@ export default defineConfig({
     VitePWA({
       // 'prompt' = on demande a l'utilisateur avant de basculer sur la nouvelle version
       registerType: 'prompt',
-      includeAssets: ['icon-192.png', 'icon-512.png'],
+      includeAssets: ['icon-192.png', 'icon-512.png', 'logo.png'],
       manifest: {
         name: 'Fresitalocks CRM',
         short_name: 'Fresitalocks',
