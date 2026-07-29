@@ -288,7 +288,7 @@ Testé : Reprise 30 locks/Épaules/Fines = 120€, + prestation = 140€, Formul
 
 ## 19. Logo Fresita Locks (icônes + démarrage)
 
-- **icon-192.png** et **icon-512.png** régénérées depuis ton logo (carré, logo centré sur fond blanc) → icône sur l'écran d'accueil + splash Android.
+- **icon-192.png** et **icon-512.png** = logo centré sur **fond TRANSPARENT** (plus de carré blanc), déclaration `maskable` retirée du manifest.
 - **logo.png** (transparent) ajouté et affiché sur l'**écran de démarrage** de l'app (à la place du texte "Fresitalocks"), sous-titre "Locktician" conservé.
 - `logo.png` mis en cache (offline) via la config PWA.
 
