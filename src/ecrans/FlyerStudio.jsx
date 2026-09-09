@@ -29,3 +29,8 @@ export default function FlyerStudio({d, upd, go, estMobile}) {
     : <section><BarreTitre titre="Flyer studio" sous="L’éditeur est redessiné, le rendu des flyers est conservé"/>
         <div className="content">{editeur}</div></section>;
 }
+
+
+export const routes = [
+  { id: 'flyer', titre: 'Flyer studio', ic: '🎨', grp: 'CRÉATION', ordre: 50, composant: FlyerStudio },
+];

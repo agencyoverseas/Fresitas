@@ -314,3 +314,8 @@ export default function Reglages({ d, upd, go, sel, estMobile, setToast }) {
     </section>
   );
 }
+
+
+export const routes = [
+  { id: 'reglages', titre: 'Réglages', ic: '⚙️', grp: 'COMPTE', ordre: 60, composant: Reglages },
+];

@@ -186,3 +186,9 @@ export default function Dashboard({ d, go, estMobile, exportData }) {
     </section>
   );
 }
+
+
+/* Declaration lue par le routeur : rien a inscrire ailleurs. */
+export const routes = [
+  { id: 'dashboard', titre: 'Dashboard', ic: '🏠', grp: 'ACTIVITÉ', bas: 'Accueil', ordre: 10, defaut: true, composant: Dashboard },
+];

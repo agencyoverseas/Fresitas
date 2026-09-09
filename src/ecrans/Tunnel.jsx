@@ -9,6 +9,7 @@ import { calcPrix, detailPrix } from '../prix.js';
 import { moyensActifs, construireLien } from '../paiement.js';
 import { H_DEBUT, H_FIN, hhmm, min, duree, fmtDuree, dureeSuggeree, chevauche, libelleJour, demain } from '../agenda.js';
 import { creerDocument } from '../factures.js';
+import { useRetour } from '../nav.js';
 
 const ETAPES = ['Cliente', 'Devis', 'Créneau', 'Récapitulatif', 'Paiement', 'Confirmé'];
 
@@ -38,6 +39,12 @@ export default function Tunnel({ d, upd, go, sel, estMobile, setToast }) {
   const dureeAuto = dureeSuggeree(cfg, f.prestSel);
   const collision = chevauche(d.apts, f.date, f.time, Number(f.dur) || dureeAuto);
   const moyens = moyensActifs(cfg.paiements);
+
+  // Le geste retour recule d'une etape au lieu de quitter le tunnel
+  useRetour(() => {
+    if (e > 1 && e < 6) { setE(e - 1); return true; }
+    return false;
+  }, [e]);
 
   const libelle = f.mode === 'reprise'
     ? `Reprise ${f.nbLocks} locks`
@@ -236,16 +243,39 @@ export default function Tunnel({ d, upd, go, sel, estMobile, setToast }) {
   const jauge = <div className="etapes" style={{ marginTop: 11 }}>
     {ETAPES.map((_, i) => <i key={i} className={i < e ? 'on' : ''} />)}</div>;
 
+  /* Le total suit chaque coche, chaque changement de longueur ou de
+     grosseur. Il reste visible a toutes les etapes : sans ca, on ne
+     decouvre le prix qu'au recapitulatif. */
+  const totalMobile = (
+    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+      <div style={{ fontSize: 9.5, opacity: .75, letterSpacing: .6 }}>TOTAL</div>
+      <div style={{ fontFamily: "'Fraunces',serif", fontSize: 22, fontWeight: 700, lineHeight: 1.1 }}>
+        {euros(total)}</div>
+      <div style={{ fontSize: 10, opacity: .75 }}>acompte {acompte.toFixed(2)} €</div>
+    </div>
+  );
+  const totalPC = (
+    <div style={{ textAlign: 'right', padding: '2px 16px', borderRadius: 14, background: 'var(--lavande-100)' }}>
+      <div style={{ fontSize: 9.5, color: 'var(--texte-2)', letterSpacing: .6 }}>TOTAL</div>
+      <div style={{ fontFamily: "'Fraunces',serif", fontSize: 22, fontWeight: 700, color: 'var(--accent-txt)', lineHeight: 1.15 }}>
+        {euros(total)}</div>
+      <div style={{ fontSize: 10.5, color: 'var(--texte-2)' }}>acompte {acompte.toFixed(2)} €</div>
+    </div>
+  );
+
   if (estMobile) return (
     <div className="mbx">
-      <EnteteMobile titre="Nouvelle réservation" sous={`Étape ${e} sur 6 — ${ETAPES[e - 1]}`} retour="bookings" go={go}>{jauge}</EnteteMobile>
+      <EnteteMobile titre="Nouvelle réservation" sous={`Étape ${e} sur 6 — ${ETAPES[e - 1]}`}
+                    retour="bookings" go={go} droite={e < 6 ? totalMobile : null}>{jauge}</EnteteMobile>
       <div className="mb-body" style={{ marginTop: 0, paddingTop: 14 }}>{etape()}{pieds}</div>
     </div>
   );
 
   return (
     <section>
-      <BarreTitre titre="Nouvelle réservation" sous={`Étape ${e} sur 6 — ${ETAPES[e - 1]}`} />
+      <BarreTitre titre="Nouvelle réservation" sous={`Étape ${e} sur 6 — ${ETAPES[e - 1]}`}>
+        {e < 6 && totalPC}
+      </BarreTitre>
       <div className="content" style={{ maxWidth: 560 }}>
         <div className="etapes" style={{ marginBottom: 16 }}>
           {ETAPES.map((_, i) => <i key={i} className={i < e ? 'on' : ''} style={{ background: i < e ? 'var(--violet-600)' : 'var(--lavande-100)' }} />)}
@@ -302,3 +332,9 @@ export function FicheRdv({ d, upd, go, sel, estMobile, setToast }) {
         <button className="btn btn-s" onClick={() => go('bookings')}>Retour au planning</button></BarreTitre>
         <div className="content" style={{ maxWidth: 520 }}>{corps}</div></section>;
 }
+
+
+export const routes = [
+  { id: 'tunnel', parent: 'bookings', composant: Tunnel },
+  { id: 'rdv',    parent: 'bookings', composant: FicheRdv },
+];

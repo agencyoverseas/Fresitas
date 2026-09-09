@@ -274,3 +274,9 @@ export function Relances({ d, go, estMobile }) {
         <div className="content" style={{ maxWidth: 620 }}>{intro}{liste}</div>
       </section>;
 }
+
+
+export const routes = [
+  { id: 'bookings', titre: 'Bookings', ic: '📅', grp: 'ACTIVITÉ', bas: 'Bookings', ordre: 20, composant: Bookings },
+  { id: 'relances', titre: 'À relancer', ic: '🔄', grp: 'ACTIVITÉ', ordre: 40, composant: Relances },
+];

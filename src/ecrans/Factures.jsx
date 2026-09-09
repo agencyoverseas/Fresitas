@@ -13,32 +13,19 @@ const badge = s => (STATUTS.find(x => x.id === s) || STATUTS[0]);
 
 /* Le PDF est fabrique a la demande : jspdf ne pese sur personne
    tant qu'aucun document n'est edite. */
-async function genererPDF(f, cfg, setToast) {
+async function genererPDF(fac, cfg, setToast) {
   setToast('Génération du PDF…');
-  const { jsPDF } = await import('jspdf');
-  const p = new jsPDF({ unit: 'mm', format: 'a4' });
-  let y = 22;
-  p.setFontSize(18); p.text(cfg.nom || 'Fresitalocks', 20, y); y += 7;
-  p.setFontSize(9);
-  [cfg.adresse, cfg.tel, cfg.siret ? 'SIRET ' + cfg.siret : ''].filter(Boolean).forEach(l => { p.text(String(l), 20, y); y += 4.5; });
-  y += 8;
-  p.setFontSize(14); p.text(`${f.type === 'DEV' ? 'Devis' : f.type === 'REC' ? 'Reçu' : 'Facture'} ${f.num}`, 20, y); y += 6;
-  p.setFontSize(9);
-  p.text(`Date : ${f.date}`, 20, y); y += 4.5;
-  p.text(`Cliente : ${f.clientNom || '—'}`, 20, y); y += 10;
-  p.setFontSize(10);
-  (f.lignes || []).forEach(l => {
-    p.text(String(l.lb), 20, y);
-    p.text(`${Number(l.pr) || 0} EUR`, 180, y, { align: 'right' });
-    y += 6;
-  });
-  y += 2; p.line(20, y, 190, y); y += 7;
-  p.setFontSize(12);
-  p.text('Total', 20, y); p.text(`${f.total} EUR`, 180, y, { align: 'right' }); y += 8;
-  p.setFontSize(8);
-  p.text(mentionTVA(cfg), 20, y);
-  p.save(`${f.num}.pdf`);
-  setToast('PDF téléchargé — joins-le à ton message');
+  try {
+    const [{ jsPDF }, mod] = await Promise.all([
+      import('jspdf'),
+      import('../facturePdf.js'),
+    ]);
+    await mod.default(fac, cfg, { jsPDF });
+    setToast('PDF téléchargé — joins-le à ton message');
+  } catch (err) {
+    console.error(err);
+    setToast('Le PDF n’a pas pu être généré');
+  }
 }
 
 export default function Factures({ d, upd, go, estMobile, setToast }) {
@@ -191,3 +178,9 @@ export function DetailFacture({ d, upd, go, sel, estMobile, setToast }) {
         <button className="btn btn-s" onClick={() => go('invoices')}>Retour</button></BarreTitre>
         <div className="content" style={{ maxWidth: 620 }}>{corps}</div></section>;
 }
+
+
+export const routes = [
+  { id: 'invoices', titre: 'Factures', ic: '🧾', grp: 'ACTIVITÉ', bas: 'Factures', ordre: 30, composant: Factures },
+  { id: 'facture',  parent: 'invoices', composant: DetailFacture },
+];

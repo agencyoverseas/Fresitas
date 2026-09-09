@@ -18,17 +18,17 @@
    ═══════════════════════════════════════════════════════════ */
 
 const TYPES = [
-  { id: "montant", label: "Lien avec le montant", aide: "Le gabarit contient {montant}. Le lien est fabrique pour chaque cliente." },
-  { id: "fixe",    label: "Lien fixe",            aide: "Toujours la meme adresse. La cliente saisit elle-meme la somme." },
-  { id: "hors",    label: "Hors ligne",           aide: "Rien a ouvrir. On note simplement que la cliente a regle." },
+  { id: "montant", label: "Lien avec le montant", aide: "Le gabarit contient {montant}. Le lien est fabriqué pour chaque cliente." },
+  { id: "fixe",    label: "Lien fixe",            aide: "Toujours la même adresse. La cliente saisit elle-même la somme." },
+  { id: "hors",    label: "Hors ligne",           aide: "Rien à ouvrir. On note simplement que la cliente a réglé." },
 ];
 
 /* Depart volontairement neutre : des exemples a completer, pas des
    liens inventes. Revolut est en "fixe" parce qu'un lien revolut.me
    est un lien de profil : c'est le payeur qui entre la somme. */
 const DEFAULT_PAIEMENTS = [
-  { id: "especes",  nom: "Especes",   type: "hors",    tpl: "",  actif: true,  defaut: true,  note: "" },
-  { id: "virement", nom: "Virement",  type: "hors",    tpl: "",  actif: true,  defaut: false, note: "IBAN a renseigner" },
+  { id: "especes",  nom: "Espèces",   type: "hors",    tpl: "",  actif: true,  defaut: true,  note: "" },
+  { id: "virement", nom: "Virement",  type: "hors",    tpl: "",  actif: true,  defaut: false, note: "IBAN à renseigner" },
   { id: "revolut",  nom: "Revolut",   type: "fixe",    tpl: "",  actif: false, defaut: false, note: "Colle ton lien revolut.me" },
   { id: "paypal",   nom: "PayPal",    type: "montant", tpl: "",  actif: false, defaut: false, note: "Gabarit du type .../{montant}EUR" },
   { id: "sumup",    nom: "SumUp",     type: "fixe",    tpl: "",  actif: false, defaut: false, note: "Colle le lien cree dans SumUp" },

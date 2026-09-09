@@ -5,6 +5,10 @@ import React, { useRef, useState } from 'react';
 import { BarreTitre, EnteteMobile } from '../coquilles.jsx';
 import { DEF } from '../data.js';
 
+/* Injectes par vite au moment de la compilation */
+const VERSION = typeof __VERSION__ !== 'undefined' ? __VERSION__ : 'dev';
+const DATE_BUILD = typeof __DATE_BUILD__ !== 'undefined' ? __DATE_BUILD__ : new Date().toISOString();
+
 const JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
 const Cadre = ({ titre, sous, retour, go, estMobile, actions, children, large }) => estMobile
@@ -125,6 +129,12 @@ export function Securite({ d, setD, go, estMobile, setToast, exportData }) {
           </button>
           {confirme && <button className="btn btn-s btn-sm" style={{ width: '100%', marginTop: 8 }} onClick={() => setConfirme(false)}>Annuler</button>}
           <div style={{ marginTop: 20, paddingTop: 16, borderTop: 'var(--bord)' }}>
+            <div className="sec-t">Version installée</div>
+            <p style={{ fontSize: 11.5, color: 'var(--texte-2)', marginBottom: 14 }}>
+              {VERSION} — mise en ligne le {new Date(DATE_BUILD).toLocaleString('fr-FR')}.
+              Si ce numéro ne correspond pas à ta dernière mise en ligne, touche
+              « Mettre à jour » sur la bannière.
+            </p>
             <div className="sec-t">Accès</div>
             <p style={{ fontSize: 11.5, color: 'var(--texte-2)' }}>
               L’app s’ouvre directement, sans code. Un code protégerait l’écran, pas les données : le contenu reste
@@ -189,3 +199,10 @@ export function Preferences({ d, upd, go, estMobile, theme, force, setForce, set
     </Cadre>
   );
 }
+
+
+export const routes = [
+  { id: 'profil',   titre: 'Profil',       ic: '👤',  grp: 'COMPTE', ordre: 70, composant: Profil },
+  { id: 'securite', titre: 'Sécurité',     ic: '🔒',  grp: 'COMPTE', ordre: 80, composant: Securite },
+  { id: 'prefs',    titre: 'Préférences',  ic: '🎚️', grp: 'COMPTE', ordre: 90, composant: Preferences },
+];

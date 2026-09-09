@@ -1,4 +1,14 @@
 import {defineConfig} from 'vite';
+
+/* Identite de la compilation.
+   Sans elle, un push qui ne change pas le code compile produit un
+   paquet identique : le service worker ne bouge pas et la banniere
+   "Nouvelle version" ne s'affiche jamais. Avec elle, chaque mise en
+   ligne est unique, donc chaque push declenche la banniere.
+   Sur Vercel on prend le numero du commit, sinon l'horodatage. */
+const sha = process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA || '';
+const VERSION = sha ? sha.slice(0, 7) : 'local-' + Date.now().toString(36);
+const DATE_BUILD = new Date().toISOString();
 import react from '@vitejs/plugin-react';
 import {VitePWA} from 'vite-plugin-pwa';
 
@@ -36,5 +46,9 @@ export default defineConfig({
       },
     }),
   ],
+  define: {
+    __VERSION__: JSON.stringify(VERSION),
+    __DATE_BUILD__: JSON.stringify(DATE_BUILD),
+  },
   build: {outDir: 'dist', sourcemap: false},
 });

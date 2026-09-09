@@ -161,3 +161,8 @@ export default function Paiement({ d, upd, go, sel, estMobile, setToast }) {
     : <section><BarreTitre titre="Paiement & signature" sous={`${client?.n || ''} — ${libelleJour(apt.date)}`} />
         <div className="content" style={{ maxWidth: 560 }}>{corps}</div></section>;
 }
+
+
+export const routes = [
+  { id: 'paiement', titre: 'Paiement & signature', ic: '✍️', grp: 'ACTIVITÉ', ordre: 35, composant: Paiement },
+];

@@ -21,7 +21,45 @@ hors ligne. Aucun format d'URL n'est codé en dur : chacun colle le sien.
 > tourne dans un navigateur est lisible par n'importe qui. L'app refuse les gabarits
 > qui en contiennent. Ces liens n'en ont pas besoin, c'est tout l'intérêt.
 
+**Bannière de mise à jour, à tous les coups.** Chaque compilation reçoit un
+numéro unique (le commit sur Vercel, l'horodatage en local), injecté dans le
+paquet. Sans ça, un push qui ne modifie pas le code compilé produisait un
+service worker identique et la bannière ne sortait jamais. Le numéro est
+visible dans Réglages > Sécurité, pour vérifier quelle version tourne
+réellement chez Fresita.
+
+L'app vérifie toutes les minutes et à chaque retour au premier plan. La mise
+à jour bascule le service worker et recharge — **elle ne touche jamais à
+localStorage**, où vivent clientes, rendez-vous et factures.
+
 **Thème sombre**, suivant la préférence du système au premier lancement.
+
+## Routeur universel
+
+Pour ajouter un écran, il suffit de **déposer un fichier dans `src/ecrans/`**
+avec un bloc `routes` à la fin. Rien à déclarer ailleurs : ni dans `App.jsx`,
+ni dans le menu.
+
+    export const routes = [
+      { id: 'clientes', titre: 'Clientes', ic: '👥', grp: 'ACTIVITÉ',
+        bas: 'Clientes', ordre: 25, composant: Clientes },
+      { id: 'cliente', parent: 'clientes', composant: FicheCliente },
+    ];
+
+- `titre` absent → écran caché, joignable uniquement par `go('id')`
+- `bas` → apparaît dans la nav basse mobile (3 places ; le reste passe
+  dans la feuille « Plus » automatiquement)
+- `parent` → l'écran à rallumer dans le rail quand on est sur un sous-écran
+- `ordre` → range l'entrée dans le rail
+
+Un fichier sans bloc `routes` est ignoré, avec un avertissement dans la
+console plutôt qu'un écran blanc. Les identifiants en double sont signalés
+de la même façon.
+
+Le **retour**, lui, n'a jamais rien à déclarer : chaque `go()` empile une
+entrée d'historique, donc tout écran nouveau en hérite. Un écran qui veut
+gérer le retour lui-même (le tunnel recule d'une étape) s'inscrit avec
+`useRetour()` depuis `src/nav.js`.
 
 ## Écrans
 
@@ -29,7 +67,7 @@ Dashboard (8 indicateurs), Bookings (jour en planning horaire, semaine, mois, li
 tunnel de réservation en 6 étapes, fiche rendez-vous, À relancer, Factures
 (DEV/FAC/REC + année, 5 statuts, échéancier 1 à 4 fois), détail de facture avec PDF,
 Paiement & signature (signature au doigt), Réglages (6 onglets), Profil, Sécurité,
-Préférences, Flyer studio.
+Préférences, Flyer studio, Clientes et fiche cliente.
 
 ## Ce qui n'est PAS fait, volontairement
 
