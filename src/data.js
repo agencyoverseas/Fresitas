@@ -1,3 +1,6 @@
+import {grilleDepuisPct} from './prix.js';
+import {DEFAULT_PAIEMENTS} from './paiement.js';
+
 /* ═══ STORAGE ═══ */
 const SK="fresita_v8";
 
@@ -9,23 +12,29 @@ const DEFAULT_PRICING={
   ],
   zones:[
     {id:"cou",label:"Cou / Nuque",cm:25,pct:-5},
-    {id:"epaules",label:"Epaules",cm:40,pct:0},
+    {id:"epaules",label:"Épaules",cm:40,pct:0},
     {id:"dos",label:"Dos",cm:55,pct:10},
     {id:"basdos",label:"Bas du dos",cm:65,pct:15},
     {id:"fesses",label:"Fesses",cm:70,pct:20},
-    {id:"bassin",label:"Bassin+",cm:85,pct:30}
+    {id:"bassin",label:"Bassin +",cm:85,pct:30}
   ],
   grosseurs:[
     {id:"micro",label:"Micro",mm:4,pct:-12},
     {id:"fines",label:"Fines",mm:7,pct:0},
     {id:"moyennes",label:"Moyennes",mm:11,pct:16},
     {id:"larges",label:"Larges",mm:16,pct:36}
-  ]
+  ],
+  // "grille" = tranche + case en euros. "pct" = ancien calcul proportionnel.
+  mode:"grille",
+  grille:{}
 };
+// La grille par defaut est calculee depuis les pourcentages ci-dessus,
+// pour que personne n'ait 24 cases vides a remplir au premier lancement.
+DEFAULT_PRICING.grille=grilleDepuisPct(DEFAULT_PRICING);
 const DEFAULT_FORMULES=[
-  {id:"fo1",num:"01",title:"RETWIST SEUL",subtitle:"",note:"Supplement coiffure : +20 EUR (Vanilles, Nattes, Petales)",lengths:[{label:"Locks courtes",prix:80},{label:"Locks mi-longues",prix:90},{label:"Locks longues",prix:100},{label:"Locks tres longues",prix:110}]},
-  {id:"fo2",num:"02",title:"FORMULE SIMPLE",subtitle:"Shampoing + Retwist",note:"Coiffure incluse (sans supplement)",lengths:[{label:"Locks courtes",prix:125},{label:"Locks mi-longues",prix:145},{label:"Locks longues",prix:165},{label:"Locks tres longues",prix:185}]},
-  {id:"fo3",num:"03",title:"FORMULE ESSENTIELLE",subtitle:"Soin + Shampoing + Retwist",note:"Coiffure incluse (sans supplement)",lengths:[{label:"Locks courtes",prix:180},{label:"Locks mi-longues",prix:200},{label:"Locks longues",prix:220},{label:"Locks tres longues",prix:240}]}
+  {id:"fo1",num:"01",title:"RETWIST SEUL",subtitle:"",note:"Supplément coiffure : +20 EUR (Vanilles, Nattes, Petales)",lengths:[{label:"Locks courtes",prix:80},{label:"Locks mi-longues",prix:90},{label:"Locks longues",prix:100},{label:"Locks très longues",prix:110}]},
+  {id:"fo2",num:"02",title:"FORMULE SIMPLE",subtitle:"Shampoing + Retwist",note:"Coiffure incluse (sans supplément)",lengths:[{label:"Locks courtes",prix:125},{label:"Locks mi-longues",prix:145},{label:"Locks longues",prix:165},{label:"Locks très longues",prix:185}]},
+  {id:"fo3",num:"03",title:"FORMULE ESSENTIELLE",subtitle:"Soin + Shampoing + Retwist",note:"Coiffure incluse (sans supplément)",lengths:[{label:"Locks courtes",prix:180},{label:"Locks mi-longues",prix:200},{label:"Locks longues",prix:220},{label:"Locks très longues",prix:240}]}
 ];
 const DEFAULT_FLYER={
   id:"f1",name:"Dispos Aout 2026",collab:true,
@@ -53,9 +62,9 @@ const DEFAULT_FLYER={
   template:"grille",
   plTitle:"TARIFS",plSubtitle:"Fresita Locks",plStyle:"bars",plTheme:"#5A2070",plContact:"@fresitalocks_",plFooter:"Reserve ton creneau en DM",
   plCategories:[
-    {id:"pc1",name:"RETWIST SEUL",photo:"",items:[{label:"Locks courtes",prix:80},{label:"Locks mi-longues",prix:90},{label:"Locks longues",prix:100},{label:"Locks tres longues",prix:110}]},
-    {id:"pc2",name:"FORMULE SIMPLE",photo:"",items:[{label:"Locks courtes",prix:125},{label:"Locks mi-longues",prix:145},{label:"Locks longues",prix:165},{label:"Locks tres longues",prix:185}]},
-    {id:"pc3",name:"FORMULE ESSENTIELLE",photo:"",items:[{label:"Locks courtes",prix:180},{label:"Locks mi-longues",prix:200},{label:"Locks longues",prix:220},{label:"Locks tres longues",prix:240}]}
+    {id:"pc1",name:"RETWIST SEUL",photo:"",items:[{label:"Locks courtes",prix:80},{label:"Locks mi-longues",prix:90},{label:"Locks longues",prix:100},{label:"Locks très longues",prix:110}]},
+    {id:"pc2",name:"FORMULE SIMPLE",photo:"",items:[{label:"Locks courtes",prix:125},{label:"Locks mi-longues",prix:145},{label:"Locks longues",prix:165},{label:"Locks très longues",prix:185}]},
+    {id:"pc3",name:"FORMULE ESSENTIELLE",photo:"",items:[{label:"Locks courtes",prix:180},{label:"Locks mi-longues",prix:200},{label:"Locks longues",prix:220},{label:"Locks très longues",prix:240}]}
   ],
   attn:"Ce sont mes derniers creneaux en Guadeloupe pour l'ete ! Apres, je serai en France",
   listBadge:"DERNIERES DISPONIBILITES DU MOIS !",
@@ -65,25 +74,20 @@ const DEFAULT_FLYER={
   promoCTA:"RESERVE MAINTENANT",promoPhone:"",promoIG:"@fresitalocks_",promoFB:"Fresita Locks",promoAddress:""
 };
 const DEFAULT_PRESTATIONS=[
-  {id:"coiffure",nom:"Coiffure",prix:20,duree:45,desc:"Mise en forme apres reprise",cat:"Ajouts"},
+  {id:"coiffure",nom:"Coiffure",prix:20,duree:45,desc:"Mise en forme après reprise",cat:"Ajouts"},
   {id:"shampoing",nom:"Shampoing",prix:15,duree:20,desc:"Lavage + soin cuir chevelu",cat:"Soins"},
   {id:"soin",nom:"Soin profond",prix:25,duree:30,desc:"Masque hydratant profond",cat:"Soins"}
 ];
 // prix = tranche(nb locks) x (1+longueur%) x (1+grosseur%)
-const calcPrix=(pricing,nbLocks,zoneId,grosseurId)=>{
-  if(!pricing)return 0;
-  const tr=[...(pricing.tranches||[])].sort((a,b)=>a.max-b.max);
-  const hit=tr.find(t=>nbLocks<=t.max);
-  const base=hit?hit.prix:(tr.length?tr[tr.length-1].prix:0);
-  const z=(pricing.zones||[]).find(x=>x.id===zoneId);
-  const g=(pricing.grosseurs||[]).find(x=>x.id===grosseurId);
-  const zc=z?1+(z.pct||0)/100:1;
-  const gc=g?1+(g.pct||0)/100:1;
-  return Math.round(base*zc*gc);
-};
+// calcPrix vit desormais dans prix.js (deux modes : grille / pct)
+export {calcPrix, detailPrix} from './prix.js';
+import {calcPrix} from './prix.js';
 
 const sv=d=>{try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){}};
-const ld=()=>{try{const r=localStorage.getItem(SK);if(!r)return null;const d=JSON.parse(r);if(d&&d.cfg&&!d.cfg.pricing)d.cfg.pricing=JSON.parse(JSON.stringify(DEFAULT_PRICING));if(d&&d.cfg&&!d.cfg.prestations)d.cfg.prestations=JSON.parse(JSON.stringify(DEFAULT_PRESTATIONS));if(d&&d.cfg&&!d.cfg.flyers)d.cfg.flyers=[JSON.parse(JSON.stringify(DEFAULT_FLYER))];
+const ld=()=>{try{const r=localStorage.getItem(SK);if(!r)return null;const d=JSON.parse(r);if(d&&d.cfg&&!d.cfg.pricing)d.cfg.pricing=JSON.parse(JSON.stringify(DEFAULT_PRICING));
+    // grille tarifaire : pre-remplie depuis les % deja regles par la locticienne
+    if(d&&d.cfg&&d.cfg.pricing){if(!d.cfg.pricing.mode)d.cfg.pricing.mode="grille";if(!d.cfg.pricing.grille||!Object.keys(d.cfg.pricing.grille).length)d.cfg.pricing.grille=grilleDepuisPct(d.cfg.pricing);}
+    if(d&&d.cfg&&!d.cfg.paiements)d.cfg.paiements=JSON.parse(JSON.stringify(DEFAULT_PAIEMENTS));if(d&&d.cfg&&!d.cfg.prestations)d.cfg.prestations=JSON.parse(JSON.stringify(DEFAULT_PRESTATIONS));if(d&&d.cfg&&!d.cfg.flyers)d.cfg.flyers=[JSON.parse(JSON.stringify(DEFAULT_FLYER))];
     if(d&&d.cfg&&d.cfg.flyers)d.cfg.flyers.forEach(fl=>{if(!fl.template)fl.template="grille";if(!fl.plStyle)fl.plStyle="bars";if(!fl.plCategories){fl.plTitle="TARIFS";fl.plSubtitle="Fresita Locks";fl.plTheme="#5A2070";fl.plContact="@fresitalocks_";fl.plFooter="Reserve ton creneau en DM";fl.plCategories=JSON.parse(JSON.stringify(DEFAULT_FLYER.plCategories));}if(!fl.attn){fl.attn=DEFAULT_FLYER.attn;fl.listBadge=DEFAULT_FLYER.listBadge;fl.listFooter=DEFAULT_FLYER.listFooter;}if(!fl.promoName){fl.promoTheme=DEFAULT_FLYER.promoTheme;fl.promoName=DEFAULT_FLYER.promoName;fl.promoTagline=DEFAULT_FLYER.promoTagline;fl.promoPhoto="";fl.promoServices=JSON.parse(JSON.stringify(DEFAULT_FLYER.promoServices));fl.promoCTA=DEFAULT_FLYER.promoCTA;fl.promoPhone="";fl.promoIG=DEFAULT_FLYER.promoIG;fl.promoFB=DEFAULT_FLYER.promoFB;fl.promoAddress="";}});if(d&&!d.reservations)d.reservations=[];if(d&&d.cfg&&!d.cfg.formules)d.cfg.formules=JSON.parse(JSON.stringify(DEFAULT_FORMULES));return d}catch(e){return null}};
 
 /* ═══ LOCATION ═══ */
@@ -157,22 +161,27 @@ const FAQ=[
   {q:"Produits ?",a:"Mango Butterfull, PurePOUSS, Beaute Insolente, Actidetox, Afro K, Aroma-Zone, jojoba + soins jardin\nJamais lait/beurre/gel !"},
 ];
 
+
+/* Les donnees d'exemple sont datees par rapport a aujourd'hui : sans ca,
+   une installation neuve ouvre un dashboard a zero et parait cassee. */
+const _j=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+
 /* ═══ DEFAULT DATA ═══ */
 const DEF={
   clients:[
-    {id:"c1",n:"Anais M.",ph:"+590690123456",em:"",cr:"2026-01-10",bday:"",vis:4,vip:true,tr:true,rf:4,ref:null,photos:[{d:"2026-03-15"}],diag:[{d:"2026-03-15",lt:"Medium",lk:"Fine",ls:4,pr:["sec"],fr:4,no:"OK"}],loy:4,rev:[{d:"2026-03-16",st:5,tx:"Au top ! Mes locks sont magnifiques"}]},
-    {id:"c2",n:"Kevin D.",ph:"+590690987654",em:"",cr:"2026-03-01",bday:"",vis:1,vip:false,tr:false,rf:6,ref:"c1",photos:[],diag:[],loy:1,rev:[]},
-    {id:"c3",n:"Stephanie L.",ph:"+590691111111",em:"",cr:"2025-11-15",bday:"03-15",vis:6,vip:true,tr:true,rf:4,ref:null,photos:[{d:"2026-03-22"}],diag:[{d:"2026-03-22",lt:"Long",lk:"Epaisse",ls:3,pr:["demangeaisons","seches"],fr:4,no:"Amelioration"}],loy:6,rev:[{d:"2026-02-21",st:5,tx:"Mes demangeaisons ont diminue !"}]},
+    {id:"c1",n:"Anaïs M.",ph:"+590690123456",em:"",cr:_j(-240),bday:"",vis:4,vip:true,tr:true,rf:4,ref:null,photos:[{d:_j(-176)}],diag:[{d:_j(-176),lt:"Medium",lk:"Fine",ls:4,pr:["sec"],fr:4,no:"OK"}],loy:4,rev:[{d:_j(-175),st:5,tx:"Au top ! Mes locks sont magnifiques"}]},
+    {id:"c2",n:"Kevin D.",ph:"+590690987654",em:"",cr:_j(-9),bday:"",vis:1,vip:false,tr:false,rf:6,ref:"c1",photos:[],diag:[],loy:1,rev:[]},
+    {id:"c3",n:"Stéphanie L.",ph:"+590691111111",em:"",cr:_j(-300),bday:"03-15",vis:6,vip:true,tr:true,rf:4,ref:null,photos:[{d:_j(-169)}],diag:[{d:_j(-169),lt:"Long",lk:"Epaisse",ls:3,pr:["demangeaisons","seches"],fr:4,no:"Amelioration"}],loy:6,rev:[{d:_j(-198),st:5,tx:"Mes demangeaisons ont diminue !"}]},
   ],
   apts:[
-    {id:"a1",cid:"c2",date:"2026-04-05",time:"09:00",svc:"Retwist moyen",pr:80,dep:40,dpd:true,dm:"PayPal",pd:false},
-    {id:"a2",cid:"c1",date:"2026-04-12",time:"09:00",svc:"Retwist moyen+coiffure",pr:100,dep:50,dpd:true,dm:"Wero",pd:false},
-    {id:"a3",cid:"c3",date:"2026-04-12",time:"13:00",svc:"Retwist long",pr:90,dep:0,dpd:true,dm:"Confiance",pd:false},
+    {id:"a1",cid:"c2",date:_j(-3),time:"09:00",svc:"Retwist moyen",pr:80,dep:40,dpd:true,dm:"Especes",pd:true},
+    {id:"a2",cid:"c1",date:_j(0),time:"14:00",svc:"Retwist moyen+coiffure",pr:100,dep:50,dpd:true,dm:"Wero",pd:false},
+    {id:"a3",cid:"c3",date:_j(1),time:"10:00",svc:"Retwist long",pr:90,dep:0,dpd:true,dm:"Confiance",pd:false},
   ],
   slots:[{day:6,lb:"Sam",ts:["9h-11h30","13h-15h30"]},{day:3,lb:"Mer",ts:["14h-16h30"]}],
-  cfg:{short:70,med:80,lng:90,sty:20,rpl:6,rpd:5,rpc:100,depPct:50,loyTh:5,loyDis:15,refDis:10,pricing:DEFAULT_PRICING,prestations:DEFAULT_PRESTATIONS,flyers:[DEFAULT_FLYER],formules:DEFAULT_FORMULES},
+  cfg:{short:70,med:80,lng:90,sty:20,rpl:6,rpd:5,rpc:100,depPct:50,loyTh:5,loyDis:15,refDis:10,pricing:DEFAULT_PRICING,paiements:DEFAULT_PAIEMENTS,prestations:DEFAULT_PRESTATIONS,flyers:[DEFAULT_FLYER],formules:DEFAULT_FORMULES},
   flow:{step:1,fn:"",len:"med",sty:false,rep:0,mode:"reprise",nbLocks:30,zoneId:"",grosseurId:"",formuleId:"",formuleLi:0,prestSel:[],cName:"",cPhone:"",cMail:"",date:"",time:"09:00",exId:null,svc:"",tot:0,dep:0},
   reservations:[],
 };
 
-export {SK, sv, ld, LOC, P, PROBS, RT, MO, DAYNAMES, getSlots, fmtSlots, dlICS, MSG, FAQ, DEF, calcPrix, DEFAULT_PRICING, DEFAULT_FLYER};
+export {SK, sv, ld, LOC, P, PROBS, RT, MO, DAYNAMES, getSlots, fmtSlots, dlICS, MSG, FAQ, DEF, DEFAULT_PRICING, DEFAULT_FLYER};

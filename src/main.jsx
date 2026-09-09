@@ -14,6 +14,7 @@ import '@fontsource/dancing-script/400.css';
 import '@fontsource/dancing-script/700.css';
 
 import './app.css';
+import './ui.css';
 import './components/pwa.css';
 
 import App from './App.jsx';

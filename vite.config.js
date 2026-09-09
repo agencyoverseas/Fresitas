@@ -12,15 +12,16 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['icon-192.png', 'icon-512.png', 'logo.png'],
       manifest: {
-        name: 'Fresitalocks CRM',
-        short_name: 'Fresitalocks',
+        name: 'Fresitas — gestion de salon',
+        short_name: 'Fresitas',
         description: 'CRM Pro pour locktician - Fresitalocks',
         start_url: '.',
         scope: './',
         display: 'standalone',
         background_color: '#FBF7F2',
         theme_color: '#5A2070',
-        orientation: 'portrait',
+        // plus de verrou portrait : l'app tourne aussi sur PC et tablette
+        orientation: 'any',
         lang: 'fr',
         icons: [
           {src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any'},
